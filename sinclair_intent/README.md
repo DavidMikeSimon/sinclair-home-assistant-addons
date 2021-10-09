@@ -1,5 +1,7 @@
 # Home Assistant Add-on: Sinclair Intent
 
+Based on [rhasspy-homeassistant-hermes](https://github.com/rhasspy/rhasspy-homeassistant-hermes).
+
 ![Supports aarch64 Architecture][aarch64-shield]
 ![Supports amd64 Architecture][amd64-shield]
 ![Supports armhf Architecture][armhf-shield]

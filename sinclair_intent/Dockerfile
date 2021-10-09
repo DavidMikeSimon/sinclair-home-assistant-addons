@@ -9,4 +9,6 @@ RUN \
 RUN apk add --no-cache python3
 
 COPY rootfs /
-RUN chmod a+x /sinclair-intent-handler.py
+
+WORKDIR /app
+RUN pip install -r requirements.txt
