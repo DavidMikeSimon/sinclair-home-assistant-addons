@@ -11,6 +11,12 @@ _LOGGER = logging.getLogger("sinclair_intent")
 
 def main():
     parser = argparse.ArgumentParser(prog="sinclair-intent")
+    parser.add_argument("--ha-url", required=True,
+        help="URL of Home Assistant server"
+    )
+    parser.add_argument("--ha-access-token", required=True,
+        help="Home Assistant authorization bearer token"
+    )
 
     hermes_cli.add_hermes_args(parser)
     args = parser.parse_args()
@@ -22,6 +28,8 @@ def main():
     client = mqtt.Client()
     hermes = sinclair_mqtt.SinclairIntentHermesMqtt(
         client,
+        ha_url=args.ha_url,
+        ha_access_token=args.ha_access_token,
         site_ids=args.site_id
     )
 

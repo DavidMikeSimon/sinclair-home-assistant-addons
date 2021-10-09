@@ -13,4 +13,5 @@ arch:
 init: false
 options: {}
 schema: {}
+homeassistant_api: true
 #image: "ghcr.io/DavidMikeSimon/{arch}-sinclair-intent"
