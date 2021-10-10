@@ -34,10 +34,8 @@ jobs:
       - name: Get changed add-ons
         id: changed_addons
         run: |
-          export IFS=","
-
           declare -a changed_addons
-          for addon in ${{ steps.addons.outputs.addons }}; do
+          for addon in $(echo ${{ steps.addons.outputs.addons }} | sed "s/,/ /g"); do
             echo "Checking addon $addon"
             if [[ "${{ steps.changed_files.outputs.all }}" =~ $addon ]]; then
               for file in ${{ env.MONITORED_FILES }}; do
