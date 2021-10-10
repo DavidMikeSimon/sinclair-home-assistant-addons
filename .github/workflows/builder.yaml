@@ -116,5 +116,5 @@ jobs:
             --${{ matrix.arch }} \
             --target /data/${{ matrix.addon }} \
             --image "${{ steps.check.outputs.image }}" \
-            --docker-hub "ghcr.io/${{ OWNER_LC }}" \
+            --docker-hub "ghcr.io/$OWNER_LC" \
             --addon
