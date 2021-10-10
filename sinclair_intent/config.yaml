@@ -1,5 +1,5 @@
 name: Sinclair Intent
-version: "0.0.8"
+version: "0.0.9"
 slug: sinclair_intent
 description: Custom Rhasspy intent handler for Sinclair
 url: "https://github.com/DavidMikeSimon/sinclair-home-assistant-addons"
