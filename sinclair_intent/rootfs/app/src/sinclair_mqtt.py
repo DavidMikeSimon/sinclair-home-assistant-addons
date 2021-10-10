@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import logging
 import os
 import typing
@@ -30,6 +31,8 @@ _LOGGER = logging.getLogger("sinclair_intent")
 class Intent(typing.NamedTuple):
     intent_name: str
     slots: typing.Dict[str, str]
+    site_id: str
+    session_id: str
 
 class SinclairIntentHermesMqtt(HermesClient):
     def __init__(
@@ -80,26 +83,23 @@ class SinclairIntentHermesMqtt(HermesClient):
             if nlu_intent.slots:
                 for slot in nlu_intent.slots:
                     slots[slot.slot_name] = slot.value["value"]
-            intent = Intent(intent_name=nlu_intent.intent.intent_name, slots=slots)
+            intent = Intent(
+                intent_name=nlu_intent.intent.intent_name,
+                slots=slots,
+                site_id=nlu_intent.site_id,
+                session_id=nlu_intent.session_id
+            )
 
             _LOGGER.debug("Received intent: %s" % repr(intent))
 
             if intent.intent_name == "SwitchPower":
-                async for msg in self.hass_switch_power(
-                    site_id=site_id,
-                    entity_id=intent.slots['id'],
-                    state=(intent.slots['action'] == "on")
-                ):
+                async for msg in self.hass_switch_power(intent):
+                    yield msg
+            elif intent.intent_name == "GetTime":
+                async for msg in self.get_time(intent):
                     yield msg
             else:
                 _LOGGER.warning("Unknown intent: %s" % repr(intent))
-
-            # yield TtsSay(
-            #     text="Received intent",
-            #     id=str(uuid4()),
-            #     site_id=nlu_intent.site_id,
-            #     session_id=nlu_intent.session_id,
-            # )
         except Exception:
             _LOGGER.exception("handle_intent")
         finally:
@@ -133,7 +133,7 @@ class SinclairIntentHermesMqtt(HermesClient):
                 play_finished_event.set()
         else:
             _LOGGER.warning("Unexpected message: %s", message) 
-    
+
 
     async def play_sfx(
         self,
@@ -173,7 +173,16 @@ class SinclairIntentHermesMqtt(HermesClient):
 
         except asyncio.TimeoutError:
             _LOGGER.warning("Did not receive playFinished before timeout")
-    
+
+
+    def say_text_msg(self, intent, text):
+        return TtsSay(
+            text=text,
+            id=str(uuid4()),
+            site_id=intent.site_id,
+            session_id=intent.session_id,
+        )
+
 
     async def send_hass_command(self, subpath: str, json: typing.Dict[str, typing.Any]):
         url = urljoin(self.ha_url, subpath)
@@ -182,11 +191,26 @@ class SinclairIntentHermesMqtt(HermesClient):
             response.raise_for_status()
 
 
-    async def hass_switch_power(self, site_id: str, entity_id: str, state: bool):
+    async def hass_switch_power(self, intent: Intent):
+        entity_id = intent.slots['id'],
+        state = intent.slots['action'] == "on"
         sfx_name = "running_1" if state else "running_2"
-        async for msg in self.play_sfx(sfx_name, site_id=site_id, block=False):
+        async for msg in self.play_sfx(sfx_name, site_id=intent.site_id, block=False):
             yield msg
         await self.send_hass_command(
             subpath=f"/api/services/switch/turn_{'on' if state else 'off'}",
             json={"entity_id": entity_id}
         )
+
+
+    async def get_time(self, intent: Intent):
+        now = datetime.datetime.now()
+        time_desc = " ".join([
+            str(now.hour % 12),
+            "oh" if now.minute < 10 else "",
+            "clock" if now.minute == 0 else str(now.minute),
+            "eh em" if now.hour < 12 else "pee em",
+        ])
+        async for msg in self.play_sfx("ok", site_id=intent.site_id):
+            yield msg
+        yield self.say_text_msg(intent, f"Current time is {time_desc}")
