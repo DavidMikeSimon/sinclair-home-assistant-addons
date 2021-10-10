@@ -1,9 +1,9 @@
 name: Sinclair Intent
-version: "0.0.7"
+version: "0.0.8"
 slug: sinclair_intent
 description: Custom Rhasspy intent handler for Sinclair
 url: "https://github.com/DavidMikeSimon/sinclair-home-assistant-addons"
-#image: "ghcr.io/DavidMikeSimon/{arch}-sinclair-intent"
+image: "ghcr.io/DavidMikeSimon/{arch}-sinclair-intent"
 arch:
   - armhf
   - armv7
@@ -11,8 +11,6 @@ arch:
   - amd64
   - i386
 init: false
-options: {}
-schema: {}
 homeassistant_api: true
 services:
   - "mqtt:need"

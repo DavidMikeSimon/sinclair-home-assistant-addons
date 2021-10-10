@@ -10,5 +10,5 @@ exec /app/sinclair-intent-handler.py \
   --host "$MQTT_HOST" \
   --username "$MQTT_USER" \
   --password "$MQTT_PASSWORD" \
-  --ha-url "http://supervisor/core" \
+  --ha-url "http://supervisor/core/" \
   --ha-access-token "$SUPERVISOR_TOKEN"

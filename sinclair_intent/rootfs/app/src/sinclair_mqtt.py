@@ -204,7 +204,7 @@ class SinclairIntentHermesMqtt(HermesClient):
         async for msg in self.play_sfx(sfx_name, site_id=intent.site_id, block=False):
             yield msg
         await self.send_hass_command(
-            subpath=f"/api/services/switch/turn_{'on' if state else 'off'}",
+            subpath=f"api/services/switch/turn_{'on' if state else 'off'}",
             json={"entity_id": entity_id}
         )
 
