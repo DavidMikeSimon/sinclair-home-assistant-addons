@@ -98,6 +98,12 @@ class SinclairIntentHermesMqtt(HermesClient):
             elif intent.intent_name == "GetTime":
                 async for msg in self.get_time(intent):
                     yield msg
+            elif intent.intent_name == "NoOp":
+                async for msg in self.handle_no_op(intent):
+                    yield msg
+            elif intent.intent_name == "Thanks":
+                async for msg in self.handle_thanks(intent):
+                    yield msg
             else:
                 _LOGGER.warning("Unknown intent: %s" % repr(intent))
         except Exception:
@@ -194,7 +200,7 @@ class SinclairIntentHermesMqtt(HermesClient):
     async def hass_switch_power(self, intent: Intent):
         entity_id = intent.slots['id'],
         state = intent.slots['action'] == "on"
-        sfx_name = "running_1" if state else "running_2"
+        sfx_name = "response_positive" if state else "response_negative"
         async for msg in self.play_sfx(sfx_name, site_id=intent.site_id, block=False):
             yield msg
         await self.send_hass_command(
@@ -211,6 +217,17 @@ class SinclairIntentHermesMqtt(HermesClient):
             "clock" if now.minute == 0 else str(now.minute),
             "eh em" if now.hour < 12 else "pee em",
         ])
-        async for msg in self.play_sfx("ok", site_id=intent.site_id):
+        async for msg in self.play_sfx("response_middle", site_id=intent.site_id):
             yield msg
         yield self.say_text_msg(intent, f"Current time is {time_desc}")
+
+
+    async def handle_no_op(self, intent: Intent):
+        async for msg in self.play_sfx("response_negative_high", site_id=intent.site_id):
+            yield msg
+
+
+    async def handle_thanks(self, intent: Intent):
+        async for msg in self.play_sfx("response_middle", site_id=intent.site_id):
+            yield msg
+        yield self.say_text_msg(intent, f"You are welcome")
