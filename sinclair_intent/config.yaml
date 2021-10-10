@@ -1,6 +1,6 @@
 # https://developers.home-assistant.io/docs/add-ons/configuration#add-on-config
 name: Sinclair Intent
-version: "0.0.2"
+version: "0.0.3"
 slug: sinclair_intent
 description: Custom Rhasspy intent handler for Sinclair
 url: "https://github.com/DavidMikeSimon/sinclair/tree/main/sinclair_intent"
