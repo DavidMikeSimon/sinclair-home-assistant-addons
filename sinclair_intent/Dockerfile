@@ -8,7 +8,10 @@ RUN \
 
 RUN apk add --no-cache py3-pip gcc make python3-dev musl-dev
 
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
+RUN rm -f /tmp/requirements.txt
+
 COPY rootfs /
 
 WORKDIR /app
-RUN pip install -r requirements.txt
